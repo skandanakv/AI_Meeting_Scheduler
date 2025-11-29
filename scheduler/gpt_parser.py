@@ -5,10 +5,23 @@ from datetime import datetime, timedelta
 import pytz
 from dotenv import load_dotenv
 from groq import Groq
+import streamlit as st
+
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+try:
+    # Try Streamlit Cloud secrets first
+    api_key = st.secrets.get("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found in secrets")
+except:
+    # Fall back to environment variables for local development
+    api_key = os.getenv('GROQ_API_KEY')
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found in environment")
+
+client = Groq(api_key=api_key)
 
 LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
