@@ -3803,6 +3803,17 @@
 
 
 import streamlit as st
+
+# --- IMPORTANT: IMPORT LOGIN FIRST ---
+from scheduler.google_calendar import ensure_google_login
+
+# ---- RUN GOOGLE LOGIN BEFORE ANY OTHER CALENDAR LOGIC ---
+with st.sidebar:
+    if not ensure_google_login():
+        st.warning("🔐 Please log in to access your Google Calendar.")
+        st.stop()
+
+# ---- NOW SAFE TO IMPORT EVERYTHING ELSE ----
 import calendar as cal_module
 from datetime import datetime, timedelta
 import pytz
@@ -3837,6 +3848,7 @@ if 'selected_date_for_view' not in st.session_state:
     st.session_state.selected_date_for_view = None
 if 'pending_alternatives' not in st.session_state:
     st.session_state.pending_alternatives = None
+
 
 # Custom CSS
 st.markdown("""

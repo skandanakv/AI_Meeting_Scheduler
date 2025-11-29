@@ -1,220 +1,169 @@
+import streamlit as st
+import requests
 import datetime
 import pytz
-import streamlit as st
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
+# Timezone
 LOCAL_TZ = pytz.timezone("Asia/Kolkata")
 
-
-def load_credentials():
-    """Load OAuth credentials entirely from Streamlit Secrets."""
-    try:
-        client_id = st.secrets["GOOGLE_CLIENT_ID"]
-        client_secret = st.secrets["GOOGLE_CLIENT_SECRET"]
-        redirect_uri = st.secrets["GOOGLE_REDIRECT_URI"]
-        scopes = st.secrets["SCOPES"].split(", ")
-    except KeyError as e:
-        raise KeyError(f"Missing required Google OAuth secret: {e}")
-
-    # Load stored user token (if user logged in before)
-    if "user_token" in st.session_state:
-        token_data = st.session_state["user_token"]
-        creds = Credentials.from_authorized_user_info(token_data, scopes)
-
-        # Refresh if expired
-        if creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        return creds
-
-    # If token missing → user must login
-    return None
+SCOPES = [
+    "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/calendar.readonly",
+]
 
 
-def get_login_url():
-    """Generate Google OAuth login URL."""
-    from google_auth_oauthlib.flow import Flow
+# ------------------------------------------------------
+# 1️⃣ GOOGLE LOGIN FLOW (STREAMLIT CLOUD COMPATIBLE)
+# ------------------------------------------------------
+def ensure_google_login():
+    """
+    Shows Login button if user is not authenticated.
+    Saves Google OAuth token in session_state.
+    """
 
-    client_id = st.secrets["GOOGLE_CLIENT_ID"]
-    client_secret = st.secrets["GOOGLE_CLIENT_SECRET"]
-    redirect_uri = st.secrets["GOOGLE_REDIRECT_URI"]
-    scopes = st.secrets["SCOPES"].split(", ")
+    # Already authenticated
+    if "google_token" in st.session_state:
+        return True
 
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": client_id,
-                "project_id": "streamlit-app",
-                "auth_uri": st.secrets["GOOGLE_AUTH_URI"],
-                "token_uri": st.secrets["GOOGLE_TOKEN_URI"],
-                "client_secret": client_secret,
-                "redirect_uris": [redirect_uri],
-            }
-        },
-        scopes=scopes,
+    # Build Google OAuth URL
+    auth_url = (
+        f"{st.secrets['GOOGLE_AUTH_URI']}?"
+        f"client_id={st.secrets['GOOGLE_CLIENT_ID']}&"
+        f"redirect_uri={st.secrets['GOOGLE_REDIRECT_URI']}&"
+        f"response_type=code&"
+        f"scope={' '.join(SCOPES)}&"
+        f"access_type=offline&"
+        f"prompt=consent"
     )
 
-    flow.redirect_uri = redirect_uri
-
-    auth_url, _ = flow.authorization_url(
-        access_type="offline",
-        include_granted_scopes="true",
-        prompt="consent"
+    st.markdown(
+        f"""
+        <a href="{auth_url}" target="_self">
+            <button style="
+                padding: 10px 22px;
+                font-size: 16px;
+                border-radius: 8px;
+                border:none;
+                background:#4b6cb7;
+                color:white;
+                cursor:pointer;">
+                🔐 Login with Google
+            </button>
+        </a>
+        """,
+        unsafe_allow_html=True,
     )
 
-    return auth_url
+    # If redirected back with ?code=...
+    params = st.experimental_get_query_params()
+    if "code" in params:
+        code = params["code"][0]
+
+        # Exchange code for access token
+        token_payload = {
+            "code": code,
+            "client_id": st.secrets["GOOGLE_CLIENT_ID"],
+            "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
+            "redirect_uri": st.secrets["GOOGLE_REDIRECT_URI"],
+            "grant_type": "authorization_code",
+        }
+
+        response = requests.post(st.secrets["GOOGLE_TOKEN_URI"], data=token_payload)
+        token_data = response.json()
+
+        if "access_token" in token_data:
+            st.session_state["google_token"] = token_data
+            st.success("Google Calendar Connected! 🎉")
+            st.experimental_rerun()
+        else:
+            st.error("Google login failed. Please try again.")
+
+    return False
 
 
-def exchange_code_for_tokens(auth_code):
-    """Convert Google OAuth ?code= into a usable token."""
-    from google_auth_oauthlib.flow import Flow
-
-    client_id = st.secrets["GOOGLE_CLIENT_ID"]
-    client_secret = st.secrets["GOOGLE_CLIENT_SECRET"]
-    redirect_uri = st.secrets["GOOGLE_REDIRECT_URI"]
-    scopes = st.secrets["SCOPES"].split(", ")
-
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": client_id,
-                "project_id": "streamlit-app",
-                "auth_uri": st.secrets["GOOGLE_AUTH_URI"],
-                "token_uri": st.secrets["GOOGLE_TOKEN_URI"],
-                "client_secret": client_secret,
-                "redirect_uris": [redirect_uri],
-            }
-        },
-        scopes=scopes,
-    )
-
-    flow.redirect_uri = redirect_uri
-    flow.fetch_token(code=auth_code)
-
-    creds = flow.credentials
-
-    # Save token in session
-    st.session_state["user_token"] = {
-        "token": creds.token,
-        "refresh_token": creds.refresh_token,
-        "token_uri": creds.token_uri,
-        "client_id": creds.client_id,
-        "client_secret": creds.client_secret,
-        "scopes": creds.scopes,
-    }
-
-    return creds
-
-
+# ------------------------------------------------------
+# 2️⃣ BUILD CALENDAR SERVICE FROM TOKEN
+# ------------------------------------------------------
 def get_calendar_service():
-    """Return authorized Google Calendar client."""
-    creds = load_credentials()
-
-    if creds is None:
-        st.error("🔐 Google Calendar not connected. Please log in.")
+    """Returns authenticated Google Calendar API service."""
+    if "google_token" not in st.session_state:
         return None
 
-    try:
-        return build("calendar", "v3", credentials=creds)
-    except Exception as e:
-        st.error(f"Google Calendar error: {e}")
-        return None
+    token = st.session_state["google_token"]
+    access_token = token["access_token"]
+
+    session = requests.Session()
+    session.headers.update({"Authorization": f"Bearer {access_token}"})
+
+    # Build Google Calendar service
+    return build(
+        "calendar",
+        "v3",
+        developerKey=None,
+        requestBuilder=lambda *args, **kwargs: None,
+        http=session,
+    )
 
 
-# ---------------------------- API FUNCTIONS ----------------------------
-
+# ------------------------------------------------------
+# 3️⃣ FETCH UPCOMING EVENTS
+# ------------------------------------------------------
 def get_upcoming_events(max_results=10):
     service = get_calendar_service()
     if not service:
-        return []
+        return None  # Not logged in
 
     now = datetime.datetime.utcnow().isoformat() + "Z"
-    events = (
-        service.events()
-        .list(
-            calendarId="primary",
-            timeMin=now,
-            maxResults=max_results,
-            singleEvents=True,
-            orderBy="startTime",
-        )
-        .execute()
-        .get("items", [])
-    )
+
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=now,
+        maxResults=max_results,
+        singleEvents=True,
+        orderBy="startTime",
+    ).execute()
+
+    return events_result.get("items", [])
+
+
+# ------------------------------------------------------
+# 4️⃣ FETCH EVENTS FOR SPECIFIC RANGE
+# ------------------------------------------------------
+def get_events_in_range(start, end):
+    service = get_calendar_service()
+    if not service:
+        return None
+
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=start.astimezone(pytz.UTC).isoformat(),
+        timeMax=end.astimezone(pytz.UTC).isoformat(),
+        singleEvents=True,
+        orderBy="startTime",
+    ).execute()
+
+    events = []
+    for ev in events_result.get("items", []):
+        s = ev["start"]["dateTime"]
+        e = ev["end"]["dateTime"]
+        s_dt = datetime.datetime.fromisoformat(s.replace("Z", "+00:00")).astimezone(LOCAL_TZ)
+        e_dt = datetime.datetime.fromisoformat(e.replace("Z", "+00:00")).astimezone(LOCAL_TZ)
+
+        events.append({"summary": ev.get("summary"), "start": s_dt, "end": e_dt})
+
     return events
 
 
-def get_events_in_range(start_datetime, end_datetime):
-    service = get_calendar_service()
-    if not service:
-        return []
-
-    time_min = start_datetime.astimezone(pytz.UTC).isoformat()
-    time_max = end_datetime.astimezone(pytz.UTC).isoformat()
-
-    try:
-        events = (
-            service.events()
-            .list(
-                calendarId="primary",
-                timeMin=time_min,
-                timeMax=time_max,
-                singleEvents=True,
-                orderBy="startTime",
-            )
-            .execute()
-            .get("items", [])
-        )
-
-        formatted = []
-        for e in events:
-            s = datetime.datetime.fromisoformat(
-                e["start"]["dateTime"].replace("Z", "+00:00")
-            ).astimezone(LOCAL_TZ)
-            t = datetime.datetime.fromisoformat(
-                e["end"]["dateTime"].replace("Z", "+00:00")
-            ).astimezone(LOCAL_TZ)
-            formatted.append({"summary": e["summary"], "start": s, "end": t})
-
-        return formatted
-
-    except HttpError:
-        return []
-
-
-def get_busy_times(start_datetime, end_datetime):
-    service = get_calendar_service()
-    if not service:
-        return []
-
-    time_min = start_datetime.astimezone(pytz.UTC).isoformat()
-    time_max = end_datetime.astimezone(pytz.UTC).isoformat()
-
-    body = {"timeMin": time_min, "timeMax": time_max, "items": [{"id": "primary"}]}
-
-    try:
-        busy = service.freebusy().query(body=body).execute()
-        slots = busy["calendars"]["primary"]["busy"]
-
-        results = []
-        for slot in slots:
-            s = datetime.datetime.fromisoformat(slot["start"].replace("Z", "+00:00")).astimezone(LOCAL_TZ)
-            t = datetime.datetime.fromisoformat(slot["end"].replace("Z", "+00:00")).astimezone(LOCAL_TZ)
-            results.append({"start": s, "end": t})
-
-        return results
-
-    except HttpError:
-        return []
-
-
+# ------------------------------------------------------
+# 5️⃣ CREATE EVENT
+# ------------------------------------------------------
 def create_event(summary, start_datetime, end_datetime, description="", attendees=None):
     service = get_calendar_service()
     if not service:
         return None
 
-    body = {
+    event_body = {
         "summary": summary,
         "description": description,
         "start": {"dateTime": start_datetime.isoformat()},
@@ -222,9 +171,10 @@ def create_event(summary, start_datetime, end_datetime, description="", attendee
     }
 
     if attendees:
-        body["attendees"] = [{"email": x} for x in attendees]
+        event_body["attendees"] = [{"email": a} for a in attendees]
 
-    try:
-        return service.events().insert(calendarId="primary", body=body).execute()
-    except HttpError:
-        return None
+    return (
+        service.events()
+        .insert(calendarId="primary", body=event_body)
+        .execute()
+    )
