@@ -467,14 +467,6 @@
 
 
 
-
-
-
-
-
-
-
-
 import os
 import json
 import re
@@ -485,91 +477,123 @@ from groq import Groq
 
 load_dotenv()
 
-LOCAL_TZ = pytz.timezone('Asia/Kolkata')
+LOCAL_TZ = pytz.timezone("Asia/Kolkata")
+
+# Cached client instance
 _client = None
 
 
+# --------------------------------------------------
+#  SAFE — Groq only initializes inside this function
+# --------------------------------------------------
 def get_groq_client():
     global _client
     if _client is not None:
         return _client
-    
+
     api_key = None
+
+    # Try Streamlit secrets first
     try:
         import streamlit as st
-        if hasattr(st, 'secrets') and "GROQ_API_KEY" in st.secrets:
+        if "GROQ_API_KEY" in st.secrets:
             api_key = st.secrets["GROQ_API_KEY"]
     except:
         pass
-    
+
+    # If not found, use environment (.env)
     if not api_key:
-        api_key = os.getenv('GROQ_API_KEY')
-    
+        api_key = os.getenv("GROQ_API_KEY")
+
     if not api_key:
-        raise ValueError("GROQ_API_KEY not found")
-    
-    api_key = api_key.strip().strip('"').strip("'")
-    
-    if not api_key.startswith('gsk_'):
-        raise ValueError("Invalid GROQ_API_KEY")
-    
+        raise ValueError("❌ GROQ_API_KEY missing — add to Streamlit Secrets or .env")
+
+    api_key = api_key.strip().replace('"', "").replace("'", "")
+
+    if not api_key.startswith("gsk_"):
+        raise ValueError("❌ Invalid GROQ_API_KEY format")
+
+    # IMPORTANT: Client is created ONLY here (safe for Streamlit)
     _client = Groq(api_key=api_key)
     return _client
 
 
+# --------------------------------------------------
+#  PARSER
+# --------------------------------------------------
 def parse_meeting_request(user_input, current_date=None):
     if current_date is None:
         current_date = datetime.now(LOCAL_TZ)
-    
-    prompt = f"""You are a meeting scheduling assistant. Parse this request and return ONLY valid JSON.
 
-Current date: {current_date.strftime('%Y-%m-%d %H:%M')} ({current_date.strftime('%A')})
+    prompt = f"""
+You are an AI meeting scheduling assistant. Parse the user's request and return ONLY JSON.
 
-Extract these fields:
-- title: Meeting title/purpose
-- date: YYYY-MM-DD format
-- time: HH:MM format (24-hour)
+Current date: {current_date.strftime("%Y-%m-%d %H:%M")} ({current_date.strftime("%A")})
+
+Extract and return:
+- title: string
+- date: YYYY-MM-DD
+- time: HH:MM (24-hour)
 - duration_minutes: integer (default 30)
-- attendees: array of emails (empty if none)
+- attendees: list of emails
 - description: string
 
-Rules:
-- "tomorrow" = {(current_date + timedelta(days=1)).strftime('%Y-%m-%d')}
-- "morning" = 10:00, "afternoon" = 14:00, "evening" = 17:00
-- No time = 10:00, No duration = 30
+Interpretation rules:
+- "tomorrow" = {(current_date + timedelta(days=1)).strftime("%Y-%m-%d")}
+- morning = 10:00
+- afternoon = 14:00
+- evening = 17:00
+- No time → 10:00
+- No duration → 30 minutes
 
-User: "{user_input}"
+User request:
+"{user_input}"
 
-Return ONLY JSON:"""
+Return ONLY JSON. No extra text.
+"""
 
     try:
         client = get_groq_client()
+
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=300
+            max_tokens=300,
+            temperature=0.1
         )
-        
+
         content = response.choices[0].message.content.strip()
-        content = re.sub(r'```json\s*|\s*```', '', content).strip()
-        parsed_data = json.loads(content)
-        
-        required = ['title', 'date', 'time', 'duration_minutes']
-        for field in required:
-            if field not in parsed_data:
+
+        # Remove JSON fences
+        content = re.sub(r"```json|```", "", content).strip()
+
+        parsed = json.loads(content)
+
+        # Validate required fields
+        for field in ["title", "date", "time", "duration_minutes"]:
+            if field not in parsed:
                 return None
-        
-        datetime.strptime(parsed_data['date'], '%Y-%m-%d')
-        datetime.strptime(parsed_data['time'], '%H:%M')
-        
-        if 'attendees' not in parsed_data:
-            parsed_data['attendees'] = []
-        if 'description' not in parsed_data:
-            parsed_data['description'] = ''
-        
-        return parsed_data
+
+        # Validate date & time format
+        datetime.strptime(parsed["date"], "%Y-%m-%d")
+        datetime.strptime(parsed["time"], "%H:%M")
+
+        # Add default empty fields
+        parsed.setdefault("attendees", [])
+        parsed.setdefault("description", "")
+
+        return parsed
+
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"[PARSER ERROR] {e}")
         return None
+
+
+# --------------------------------------------------
+# Convert parsed fields → datetime object
+# --------------------------------------------------
+def parse_datetime_from_parsed_data(parsed_data):
+    dt_str = f"{parsed_data['date']} {parsed_data['time']}"
+    dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+    return LOCAL_TZ.localize(dt)
 
