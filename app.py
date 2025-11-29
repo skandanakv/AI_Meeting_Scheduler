@@ -3803,17 +3803,6 @@
 
 
 import streamlit as st
-
-# --- IMPORTANT: IMPORT LOGIN FIRST ---
-from scheduler.google_calendar import ensure_google_login
-
-# ---- RUN GOOGLE LOGIN BEFORE ANY OTHER CALENDAR LOGIC ---
-with st.sidebar:
-    if not ensure_google_login():
-        st.warning("🔐 Please log in to access your Google Calendar.")
-        st.stop()
-
-# ---- NOW SAFE TO IMPORT EVERYTHING ELSE ----
 import calendar as cal_module
 from datetime import datetime, timedelta
 import pytz
@@ -3823,15 +3812,30 @@ import os
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Import your modules
 from scheduler.gpt_parser import parse_meeting_request
 from scheduler.scheduler_logic import suggest_best_slot, format_slot_for_display
-from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events
+from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events, ensure_google_login
 from groq import Groq
-from dotenv import load_dotenv
 
-load_dotenv()
-
+# Page config
 st.set_page_config(page_title="AI Meeting Scheduler", page_icon="📅", layout="wide")
+
+LOCAL_TZ = pytz.timezone('Asia/Kolkata')
+
+# ---- GOOGLE LOGIN CHECK ----
+with st.sidebar:
+    st.title("🔐 Login")
+    if not ensure_google_login():
+        st.warning("Please log in to access your Google Calendar.")
+        st.stop()
+    else:
+        st.success("✅ Logged in successfully!")
+
+# ---- REST OF YOUR APP ----
+st.title("📅 AI Meeting Scheduler")
+
+# Your app logic continues here...
 
 LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
