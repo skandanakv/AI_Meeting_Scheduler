@@ -1167,6 +1167,7 @@ if send_clicked and user_input.strip():
                 'role': 'agent',
                 'content': "❌ I couldn't understand that. Please try rephrasing your request."
             })
+            st.session_state.pending_alternatives = None  # ✅ ADD THIS LINE
             st.rerun()
         
         # FIXED: Extract title properly
@@ -1182,6 +1183,7 @@ if send_clicked and user_input.strip():
                 'role': 'agent',
                 'content': f"❌ {suggestion['message']}"
             })
+            st.session_state.pending_alternatives = None  # ✅ ADD THIS LINE
         
         elif 'conflict' in suggestion:
             # Conflict detected
@@ -1244,12 +1246,14 @@ if send_clicked and user_input.strip():
                         'role': 'agent',
                         'content': response_content
                     })
+                    st.session_state.pending_alternatives = None 
                     st.balloons()
                 else:
                     st.session_state.messages.append({
                         'role': 'agent',
                         'content': "❌ Failed to create the event. Please try again."
                     })
+                    st.session_state.pending_alternatives = None
     
     # Clear input
     st.session_state.input_text = ""
