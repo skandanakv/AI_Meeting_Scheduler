@@ -1,8 +1,18 @@
+# Create the .streamlit directory if it doesn't exist
+mkdir -p .streamlit
+
+# Create config.toml
+cat > .streamlit/config.toml << 'EOF'
 [server]
 headless = true
-port = 10000
+port = 8501
 enableCORS = false
 enableXsrfProtection = false
 
 [browser]
 gatherUsageStats = false
+serverAddress = "0.0.0.0"
+
+[runner]
+magicEnabled = true
+EOF
