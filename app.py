@@ -3801,7 +3801,6 @@
 
 
 
-
 import streamlit as st
 import calendar as cal_module
 from datetime import datetime, timedelta
@@ -3815,7 +3814,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import your modules
 from scheduler.gpt_parser import parse_meeting_request
 from scheduler.scheduler_logic import suggest_best_slot, format_slot_for_display
-from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events, ensure_google_login
+from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events  # ← REMOVED ensure_google_login
 from groq import Groq
 
 # Page config
@@ -3823,14 +3822,14 @@ st.set_page_config(page_title="AI Meeting Scheduler", page_icon="📅", layout="
 
 LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
-# ---- GOOGLE LOGIN CHECK ----
+# ---- CALENDAR CONNECTION CHECK ---- (REPLACED LOGIN SECTION)
 with st.sidebar:
-    st.title("🔐 Login")
-    if not ensure_google_login():
-        st.warning("Please log in to access your Google Calendar.")
-        st.stop()
+    st.title("📅 Calendar Status")
+    if get_calendar_service():
+        st.success("✅ Connected to Skandana's Calendar")
     else:
-        st.success("✅ Logged in successfully!")
+        st.error("❌ Calendar connection failed. Check your secrets.")
+        st.stop()
 
 # ---- REST OF YOUR APP ----
 st.title("📅 AI Meeting Scheduler")
@@ -3852,8 +3851,6 @@ if 'selected_date_for_view' not in st.session_state:
     st.session_state.selected_date_for_view = None
 if 'pending_alternatives' not in st.session_state:
     st.session_state.pending_alternatives = None
-
-
 # Custom CSS
 st.markdown("""
 <style>
