@@ -497,12 +497,16 @@ if st.session_state.audio_bytes:
                 st.error(f"Transcription error: {e}")
 
 # Process user message when send is clicked
+# Process user message when send is clicked
 if send_clicked and user_input.strip():
     # Add user message to chat
     st.session_state.messages.append({
         'role': 'user',
         'content': user_input
     })
+    
+    # Clear input immediately to prevent reprocessing
+    st.session_state.input_text = ""
     
     with st.spinner("🤖 Processing..."):
         # Parse with AI
