@@ -6,176 +6,187 @@
 
 ## 📌 Project Information
 
-| Detail | Information |
-|--------|-------------|
-| **Live Demo** | [https://aimeetingscheduler-fi5ympfyppjxdfdhq9u8g9.streamlit.app/] |
-| **Challenge** | Rooman Technologies AI Agent Development Challenge |
-| **Category** | Business Operations - Meeting Scheduler Agent |
-| **Development Time** | 48 Hours |
-
+| Detail               | Information                                                                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Live Demo**        | [[https://aimeetingscheduler-fi5ympfyppjxdfdhq9u8g9.streamlit.app/](https://aimeetingscheduler-fi5ympfyppjxdfdhq9u8g9.streamlit.app/)] |
+| **Challenge**        | Rooman Technologies AI Agent Development Challenge                                                                                     |
+| **Category**         | Business Operations - Meeting Scheduler Agent                                                                                          |
+| **Development Time** | 48 Hours                                                                                                                               |
 
 ---
 
 ## 📝 Overview
 
 ### Problem Statement
+
 Scheduling meetings manually is time-consuming and error-prone. Professionals spend 10-15 minutes per meeting checking calendars, coordinating with attendees, and creating events. Double-bookings and scheduling conflicts are common pain points.
 
 ### Solution
+
 The AI Meeting Scheduler Agent eliminates manual coordination by:
-- Understanding natural language requests ("Schedule team meeting tomorrow at 3pm")
-- Automatically checking Google Calendar for conflicts
-- Suggesting optimal available time slots
-- Creating calendar events with one click
+
+* Understanding natural language requests ("Schedule team meeting tomorrow at 3pm")
+* Automatically checking Google Calendar for conflicts
+* Suggesting optimal available time slots
+* Creating calendar events with one click
 
 ### Real-World Impact
-- **Time Saved**: 10-15 minutes per meeting scheduled
-- **Error Reduction**: Zero double-bookings with conflict detection
-- **User Experience**: Natural conversation instead of form filling
-- **Insights**: Analytics on meeting patterns and calendar health
+
+* **Time Saved**: 10-15 minutes per meeting scheduled
+* **Error Reduction**: Zero double-bookings with conflict detection
+* **User Experience**: Natural conversation instead of form filling
+* **Insights**: Analytics on meeting patterns and calendar health
 
 ---
 
 ## ✨ Key Features
 
 ### 1. 🧠 Natural Language Understanding
-- Parse meeting requests in plain English
-- Handles variations: "tomorrow 3pm", "next Monday morning", "30 min call"
-- Extracts: title, date, time, duration, attendees
-- **Powered by**: Groq AI (Llama 3.3 70B model)
+
+* Parse meeting requests in plain English
+* Handles variations: "tomorrow 3pm", "next Monday morning", "30 min call"
+* Extracts: title, date, time, duration, attendees
+* **Powered by**: Groq AI (Llama 3.3 70B model)
 
 ### 2. 🎤 Voice Input Support
-- Click-to-speak interface for hands-free scheduling
-- Real-time speech-to-text transcription
-- Browser-based Speech Recognition API
+
+* Click-to-speak interface for hands-free scheduling
+* Real-time speech-to-text transcription
+* Browser-based Speech Recognition API
 
 ### 3. 🔍 Intelligent Conflict Detection
-- Automatically checks Google Calendar for existing events
-- Identifies time slot overlaps
-- Shows conflicting event details for context
-- **100% accuracy** using Google FreeBusy API
+
+* Automatically checks Google Calendar for existing events
+* Identifies time slot overlaps
+* Shows conflicting event details for context
+* **100% accuracy** using Google FreeBusy API
 
 ### 4. 💡 Smart Slot Suggestions
-- Finds up to 3 alternative time slots when conflicts occur
-- Respects working hours (9 AM - 6 PM, configurable)
-- 30-minute interval slots
-- Prioritizes earlier available times
+
+* Finds up to 3 alternative time slots when conflicts occur
+* Respects working hours (9 AM - 6 PM, configurable)
+* 30-minute interval slots
+* Prioritizes earlier available times
 
 ### 5. 📊 Calendar Analytics Dashboard
-- **Calendar Health Score** (0-100) based on:
-  - Meeting density
-  - Back-to-back meeting frequency
-  - Calendar fragmentation
-  - Available focus time
-- Meeting trends over 7/14/30/60/90 days
-- Duration breakdown (pie chart)
-- Weekly pattern analysis (bar chart)
-- Smart recommendations for optimization
+
+* **Calendar Health Score** (0-100) based on:
+
+  * Meeting density
+  * Back-to-back meeting frequency
+  * Calendar fragmentation
+  * Available focus time
+* Meeting trends over 7/14/30/60/90 days
+* Duration breakdown (pie chart)
+* Weekly pattern analysis (bar chart)
+* Smart recommendations for optimization
 
 ### 6. 🗓️ Calendar Heatmap Visualization
-- GitHub-style heatmap showing meeting density
-- Color-coded by number of meetings per day
-- Monthly comparison metrics
-- Peak hour identification
-- Busiest day analysis
+
+* GitHub-style heatmap showing meeting density
+* Color-coded by number of meetings per day
+* Monthly comparison metrics
+* Peak hour identification
+* Busiest day analysis
 
 ### 7. 📅 Interactive Calendar Interface
-- Mini calendar with month navigation
-- Click any date to view all events
-- Today's date highlighted
-- Upcoming events sidebar (next 5 meetings)
-- Date-specific event viewer
+
+* Mini calendar with month navigation
+* Click any date to view all events
+* Today's date highlighted
+* Upcoming events sidebar (next 5 meetings)
+* Date-specific event viewer
 
 ### 8. 💬 Chat-Based Interface
-- Conversational UI for natural interaction
-- Message history tracking
-- Real-time processing indicators
-- Error handling with helpful suggestions
+
+* Conversational UI for natural interaction
+* Message history tracking
+* Real-time processing indicators
+* Error handling with helpful suggestions
 
 ---
 
 ## 🛠️ Tech Stack & APIs
 
 ### AI & Language Processing
-| Technology | Purpose | Why? |
-|------------|---------|------|
-| **Groq AI (Llama 3.3 70B)** | Natural language parsing | Fast inference (200-500ms), free tier, 70B parameter model for accurate extraction |
-| **Custom Prompt Engineering** | Structured data extraction | Zero-shot learning with clear JSON output format |
+
+| Technology                    | Purpose                    | Why?                                                                               |
+| ----------------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| **Groq AI (Llama 3.3 70B)**   | Natural language parsing   | Fast inference (200-500ms), free tier, 70B parameter model for accurate extraction |
+| **Custom Prompt Engineering** | Structured data extraction | Zero-shot learning with clear JSON output format                                   |
 
 ### APIs & Cloud Services
-| API | Purpose | Why? |
-|-----|---------|------|
-| **Google Calendar API** | Event CRUD operations | Industry standard, reliable, comprehensive documentation |
+
+| API                     | Purpose               | Why?                                                                                                                             |
+| ----------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Google Calendar API** | Event CRUD operations | Industry standard, reliable, comprehensive documentation                                                                         |
 | **Google FreeBusy API** | Availability checking | **Real-time conflict detection without fetching full event details** - more efficient than events.list() for availability checks |
-| **Web Speech API** | Voice input | Browser-native, no external API needed, zero latency |
+| **Web Speech API**      | Voice input           | Browser-native, no external API needed, zero latency                                                                             |
 
 **Why FreeBusy API specifically?**
-- ✅ **Privacy**: Returns only busy/free status, not event details
-- ✅ **Performance**: Faster than querying full event list
-- ✅ **Efficiency**: Purpose-built for availability checking
-- ✅ **Scalability**: Can check multiple calendars simultaneously
+
+* ✅ **Privacy**: Returns only busy/free status, not event details
+* ✅ **Performance**: Faster than querying full event list
+* ✅ **Efficiency**: Purpose-built for availability checking
+* ✅ **Scalability**: Can check multiple calendars simultaneously
 
 ### Backend & Framework
-| Technology | Purpose |
-|------------|---------|
-| **Python 3.8+** | Core application logic |
+
+| Technology         | Purpose                                        |
+| ------------------ | ---------------------------------------------- |
+| **Python 3.8+**    | Core application logic                         |
 | **Streamlit 1.28** | Web UI framework with built-in chat components |
-| **Pandas** | Data processing for analytics |
-| **PyTZ** | Timezone handling (Asia/Kolkata) |
+| **Pandas**         | Data processing for analytics                  |
+| **PyTZ**           | Timezone handling (Asia/Kolkata)               |
 
 ### Visualization & UI
-| Library | Usage |
-|---------|-------|
-| **Plotly 5.18** | Interactive charts (heatmap, pie, bar, line) |
-| **Custom CSS** | Glassmorphism dark theme with gradient backgrounds |
+
+| Library         | Usage                                              |
+| --------------- | -------------------------------------------------- |
+| **Plotly 5.18** | Interactive charts (heatmap, pie, bar, line)       |
+| **Custom CSS**  | Glassmorphism dark theme with gradient backgrounds |
 
 ---
 
 ## 🏗️ Architecture & Workflow
 
-### System Architecture Diagram
-
-
-
-<img width="3116" height="551" alt="Untitled diagram-2025-11-30-061516" src="https://github.com/user-attachments/assets/be418258-14e4-46d9-b2bc-e2721ec3b917" />
-
-
-
-
-
-
-
 ### Workflow Description
 
 **Phase 1: Input Processing**
+
 1. User types or speaks meeting request
 2. Speech is converted to text (if voice input)
 3. Text is sent to NLP parser
 
 **Phase 2: AI Understanding**
+
 1. Groq AI receives structured prompt with context (current date/time)
 2. LLM extracts meeting details in JSON format
 3. System validates required fields (title, date, time, duration)
 
 **Phase 3: Calendar Analysis**
+
 1. Convert parsed data to datetime object with timezone
 2. Query Google FreeBusy API for busy periods
 3. Check if requested time overlaps with existing events
 4. If conflict: find 3 alternative slots in same/next day
 
 **Phase 4: User Interaction**
+
 1. Display parsed details with visual formatting
 2. Show suggested time slot or alternatives
 3. User selects preferred time
 4. Confirm before creating event
 
 **Phase 5: Event Creation**
+
 1. Call Google Calendar API with event details
 2. Set proper timezone (Asia/Kolkata)
 3. Add attendees if provided
 4. Send email invitations (sendUpdates='all')
 
 **Phase 6: Confirmation & Analytics**
+
 1. Display success message with calendar link
 2. Update UI with new event
 3. Refresh analytics dashboard
@@ -220,17 +231,6 @@ ai-meeting-scheduler/
 ├── .gitignore                         # Git ignore rules
 └── README.md                          # This file
 ```
-
-### Key Files Explained
-
-| File | Lines | Purpose |
-|------|-------|---------|
-| `app.py` | ~600 | Main UI with chat, calendar, sidebar |
-| `gpt_parser.py` | ~150 | Groq AI integration for NLP |
-| `scheduler_logic.py` | ~200 | Slot finding algorithm |
-| `google_calendar.py` | ~250 | Google API wrapper functions |
-| `Calendar_Heatmap.py` | ~300 | Heatmap visualization logic |
-| `Meeting_Analytics.py` | ~400 | Analytics calculations & charts |
 
 ---
 
@@ -329,131 +329,46 @@ python tests/test_full_flow.py
 
 ### Test Cases Covered
 
-| Test Case | Input | Expected Output |
-|-----------|-------|-----------------|
-| **Simple date/time** | "Meeting tomorrow at 3pm" | ✅ Correct date & 15:00 |
-| **Relative time** | "Call next Monday morning" | ✅ Next Monday & 10:00 |
-| **Duration specified** | "1 hour sync at 2pm today" | ✅ 60 minutes duration |
-| **Conflict detection** | Overlap with existing event | ⚠️ Shows alternatives |
-| **Voice input** | Spoken request via mic | ✅ Transcribed correctly |
-| **Edge case: past time** | "Meeting yesterday" | ❌ Error: past time |
+| Test Case                | Input                       | Expected Output         |
+| ------------------------ | --------------------------- | ----------------------- |
+| **Simple date/time**     | "Meeting tomorrow at 3pm"   | ✅ Correct date & 15:00  |
+| **Relative time**        | "Call next Monday morning"  | ✅ Next Monday & 10:00   |
+| **Duration specified**   | "1 hour sync at 2pm today"  | ✅ 60 minutes duration   |
+| **Conflict detection**   | Overlap with existing event | ⚠️ Shows alternatives   |
+| **Voice input**          | Spoken request via mic      | ✅ Transcribed correctly |
+| **Edge case: past time** | "Meeting yesterday"         | ❌ Error: past time      |
 
 ### Manual Testing Checklist
 
-- [ ] Natural language parsing works for 10+ variations
-- [ ] Voice input transcribes accurately
-- [ ] Calendar conflicts are detected correctly
-- [ ] Alternative slots are within working hours
-- [ ] Events appear in Google Calendar immediately
-- [ ] Heatmap updates after event creation
-- [ ] Analytics dashboard shows correct metrics
-- [ ] Mobile responsive (test on phone)
-- [ ] Error messages are user-friendly
+* [ ] Natural language parsing works for 10+ variations
+* [ ] Voice input transcribes accurately
+* [ ] Calendar conflicts are detected correctly
+* [ ] Alternative slots are within working hours
+* [ ] Events appear in Google Calendar immediately
+* [ ] Heatmap updates after event creation
+* [ ] Analytics dashboard shows correct metrics
+* [ ] Mobile responsive (test on phone)
+* [ ] Error messages are user-friendly
 
 ---
 
 ## 📊 Performance Metrics
 
-| Metric | Value | Measurement Method |
-|--------|-------|-------------------|
-| **End-to-End Latency** | < 3 seconds | From input to event creation |
-| **Groq API Response Time** | 200-500ms | Time to parse natural language |
-| **Google Calendar API** | 300-800ms | FreeBusy query + event creation |
-| **UI Rendering** | < 100ms | Streamlit rerun time |
-| **Parsing Accuracy** | ~95% | Tested on 100+ sample queries |
-| **Conflict Detection** | 100% | Uses Google's FreeBusy API |
+| Metric                     | Value       | Measurement Method              |
+| -------------------------- | ----------- | ------------------------------- |
+| **End-to-End Latency**     | < 3 seconds | From input to event creation    |
+| **Groq API Response Time** | 200-500ms   | Time to parse natural language  |
+| **Google Calendar API**    | 300-800ms   | FreeBusy query + event creation |
+| **UI Rendering**           | < 100ms     | Streamlit rerun time            |
+| **Parsing Accuracy**       | ~95%        | Tested on 100+ sample queries   |
+| **Conflict Detection**     | 100%        | Uses Google's FreeBusy API      |
 
-
+---
 
 ## 👨‍💻 Author
 
 **Skandana KV**
 
-📧 **Email**: your.email@example.com  
-🔗 **LinkedIn**: [linkedin.com/in/yourprofile]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/skandanakv))  
-💻 **GitHub**: [github.com/yourusername](https://github.com/skandanakv)  
-
-
-### About This Submission
-
-**Challenge**: Rooman Technologies AI Agent Development Challenge  
-**Category**: Business Operations - Meeting Scheduler Agent  
-**Development Period**: November 27-29, 2024 (48 hours)  
-**Submission Date**: November 29, 2024, 6:00 PM IST
-
-### Skills Demonstrated
-- AI/ML integration (Groq, LLMs)
-- API integration (Google Calendar)
-- Natural language processing
-- Python backend development
-- Streamlit UI development
-- Data visualization (Plotly)
-- OAuth 2.0 authentication
-- Timezone handling
-- Testing & debugging
-
----
-
-### Technologies & Services
-- **Groq** - For providing free, lightning-fast LLM inference that made real-time natural language parsing possible
-- **Google** - For comprehensive Calendar API documentation and reliable cloud services
-- **Streamlit** - For enabling rapid UI development with minimal code
-- **Plotly** - For beautiful, interactive data visualizations
-
-### Inspiration
-This project addresses a real pain point I've experienced in coordinating team meetings. The goal was to build something genuinely useful that could be deployed in a real workplace.
-
----
-
-**Copyright © 2024 [Your Name]. All rights reserved.**
-
-This project is licensed for:
-- ✅ Educational purposes
-- ✅ Portfolio demonstration
-- ✅ Challenge evaluation
-- ❌ Not for commercial use without permission
-
----
-
-## 📸 UI Screenshots
-
-### 1. Chat Interface
-<img width="1434" height="900" alt="Screenshot 2025-11-30 at 11 57 33 AM" src="https://github.com/user-attachments/assets/6d009ecb-2a1c-4b52-b9f4-c6ffeb92b8d4" />
-<img width="1440" height="895" alt="Screenshot 2025-11-30 at 11 57 49 AM" src="https://github.com/user-attachments/assets/ea4143b8-d220-41fb-988f-48750642963e" />
-<img width="328" height="874" alt="Screenshot 2025-11-30 at 11 59 17 AM" src="https://github.com/user-attachments/assets/2453ea21-5c4e-4659-af6e-30ff81f91d63" />
-
-
-
-
-*Natural language meeting scheduling with conversation history*
-
-### 2. Calendar Heatmap
-
-
-<img width="1440" height="899" alt="Screenshot 2025-11-30 at 11 58 39 AM" src="https://github.com/user-attachments/assets/1276c82f-91d6-4479-b016-3d6726f2f5f2" />
-<img width="1411" height="868" alt="Screenshot 2025-11-30 at 11 58 46 AM" src="https://github.com/user-attachments/assets/1c8cea50-7104-4aa4-a41b-8c13dc941b90" />
-
-
-
-
-
-
-*GitHub-style visualization of meeting density over time*
-
-### 3. Analytics Dashboard
-
-<img width="1430" height="886" alt="Screenshot 2025-11-30 at 11 58 14 AM" src="https://github.com/user-attachments/assets/b2d327a0-ff94-4bbc-92f1-a78cd16247c1" />
-<img width="1440" height="893" alt="Screenshot 2025-11-30 at 11 58 23 AM" src="https://github.com/user-attachments/assets/6919a591-cf96-4bc3-8f0c-3f1feb5dbcb2" />
-
-
-
-*Calendar health score and meeting pattern analysis*
-
-### 4. Mobile View
-![Mobile Responsive](assets/screenshot_mobile.png)
-*Fully responsive design for mobile devices*
-
----
-
-
-
+📧 **Email**: [skandanakv@gmail.com](mailto:skandanakv@gmail.com)
+🔗 **LinkedIn**: [linkedin.com/in/yourprofile](https://www.linkedin.com/in/skandanakv)
+💻 **GitHub**: [github.com/yourusername](https://github.com/yourusername)
