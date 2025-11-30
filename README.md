@@ -8,7 +8,7 @@
 
 | Detail | Information |
 |--------|-------------|
-| **Live Demo** | [Your Streamlit App URL] |
+| **Live Demo** | [https://aimeetingscheduler-fi5ympfyppjxdfdhq9u8g9.streamlit.app/] |
 | **Challenge** | Rooman Technologies AI Agent Development Challenge |
 | **Category** | Business Operations - Meeting Scheduler Agent |
 | **Development Time** | 48 Hours |
@@ -418,15 +418,35 @@ This project is licensed for:
 ## 📸 UI Screenshots
 
 ### 1. Chat Interface
-![Chat Interface](assets/screenshot_chat.png)
+<img width="1434" height="900" alt="Screenshot 2025-11-30 at 11 57 33 AM" src="https://github.com/user-attachments/assets/6d009ecb-2a1c-4b52-b9f4-c6ffeb92b8d4" />
+<img width="1440" height="895" alt="Screenshot 2025-11-30 at 11 57 49 AM" src="https://github.com/user-attachments/assets/ea4143b8-d220-41fb-988f-48750642963e" />
+<img width="328" height="874" alt="Screenshot 2025-11-30 at 11 59 17 AM" src="https://github.com/user-attachments/assets/2453ea21-5c4e-4659-af6e-30ff81f91d63" />
+
+
+
+
 *Natural language meeting scheduling with conversation history*
 
 ### 2. Calendar Heatmap
-![Calendar Heatmap](assets/screenshot_heatmap.png)
+
+
+<img width="1440" height="899" alt="Screenshot 2025-11-30 at 11 58 39 AM" src="https://github.com/user-attachments/assets/1276c82f-91d6-4479-b016-3d6726f2f5f2" />
+<img width="1411" height="868" alt="Screenshot 2025-11-30 at 11 58 46 AM" src="https://github.com/user-attachments/assets/1c8cea50-7104-4aa4-a41b-8c13dc941b90" />
+
+
+
+
+
+
 *GitHub-style visualization of meeting density over time*
 
 ### 3. Analytics Dashboard
-![Analytics Dashboard](assets/screenshot_analytics.png)
+
+<img width="1430" height="886" alt="Screenshot 2025-11-30 at 11 58 14 AM" src="https://github.com/user-attachments/assets/b2d327a0-ff94-4bbc-92f1-a78cd16247c1" />
+<img width="1440" height="893" alt="Screenshot 2025-11-30 at 11 58 23 AM" src="https://github.com/user-attachments/assets/6919a591-cf96-4bc3-8f0c-3f1feb5dbcb2" />
+
+
+
 *Calendar health score and meeting pattern analysis*
 
 ### 4. Mobile View
@@ -435,9 +455,5 @@ This project is licensed for:
 
 ---
 
-**⭐ If this project helped you, please consider giving it a star on GitHub!**
 
-**📧 Questions or feedback? Reach out at: your.email@example.com**
-
-**🔗 Live Demo**: [https://aimeetingscheduler-fi5ympfyppjxdfdhq9u8g9.streamlit.app/]
 
