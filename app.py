@@ -1724,14 +1724,20 @@ st.markdown("---")
 col1, col2, col3 = st.columns([8, 1, 1])
 
 with col1:
+    # Check if there's transcribed text to show
+    default_value = st.session_state.get('transcribed_text', '')
+    
     user_input = st.text_input(
         "Type your message...",
-        value="",
+        value=default_value,
         key=f"chat_input_{st.session_state.input_key}",
         label_visibility="collapsed",
         placeholder="Type your message..."
     )
-
+    
+    # Clear transcribed text after it's been shown
+    if 'transcribed_text' in st.session_state and default_value:
+        del st.session_state.transcribed_text
 with col2:
     send_clicked = st.button("➤", use_container_width=True, key="send_btn")
 
@@ -1777,105 +1783,10 @@ if st.session_state.audio_bytes:
                         model="whisper-large-v3"
                     )
                 
-                transcribed_text = transcription.text
-                
-                # Clear audio immediately
-                st.session_state.audio_bytes = None
-                
-                # Add user message to chat
-                st.session_state.messages.append({
-                    'role': 'user',
-                    'content': transcribed_text
-                })
-                
-                # Increment key to clear text input
-                st.session_state.input_key += 1
-                
-                # Process the transcribed message (same logic as text input)
-                with st.spinner("🤖 Processing..."):
-                    parsed = parse_meeting_request(transcribed_text)
-                    
-                    if not parsed:
-                        st.session_state.messages.append({
-                            'role': 'agent',
-                            'content': "❌ I couldn't understand that. Please try rephrasing your request."
-                        })
-                        st.session_state.pending_alternatives = None
-                        st.rerun()
-                    
-                    event_title = parsed.get('title') or parsed.get('summary') or 'Untitled Meeting'
-                    suggestion = suggest_best_slot(parsed)
-                    
-                    if not suggestion['success']:
-                        st.session_state.messages.append({
-                            'role': 'agent',
-                            'content': f"❌ {suggestion['message']}"
-                        })
-                        st.session_state.pending_alternatives = None
-                    
-                    elif 'conflict' in suggestion:
-                        conflict = suggestion['conflict']
-                        response_content = f"""
-                        📋 I found your meeting details:<br>
-                        <span class="parsed-inline">📌 {event_title}</span>
-                        <span class="parsed-inline">📅 {parsed['date']}</span>
-                        <span class="parsed-inline">🕐 {parsed['time']}</span>
-                        <span class="parsed-inline">⏱️ {parsed['duration_minutes']} min</span>
-                        <br><br>
-                        ⚠️ <strong>Conflict detected:</strong> Your requested time overlaps with <strong>{conflict['summary']}</strong> 
-                        ({conflict['start'].strftime('%I:%M %p')} - {conflict['end'].strftime('%I:%M %p')})
-                        <br><br>
-                        I found {len(suggestion.get('alternatives', []))} alternative times. Please select one below:
-                        """
-                        st.session_state.messages.append({
-                            'role': 'agent',
-                            'content': response_content
-                        })
-                        st.session_state.pending_alternatives = {
-                            'slots': suggestion['alternatives'],
-                            'parsed': parsed
-                        }
-                    
-                    else:
-                        slot = suggestion['slot']
-                        formatted = format_slot_for_display(slot)
-                        
-                        with st.spinner("Creating event..."):
-                            event = create_event(
-                                summary=event_title,
-                                start_datetime=slot['start'],
-                                end_datetime=slot['end'],
-                                description=parsed.get('description', ''),
-                                attendees=parsed.get('attendees', [])
-                            )
-                            
-                            if event:
-                                response_content = f"""
-                                ✅ Perfect! Your requested time is available.<br><br>
-                                <div class="success-box">
-                                    <div class="success-title">🎉 Event Created Successfully!</div>
-                                    <div style="margin: 10px 0;">
-                                        <strong>{event_title}</strong><br>
-                                        {formatted['full_display']}
-                                    </div>
-                                    <a href="{event.get('htmlLink', '#')}" target="_blank" class="success-link">
-                                        📅 View Event in Google Calendar →
-                                    </a>
-                                </div>
-                                """
-                                st.session_state.messages.append({
-                                    'role': 'agent',
-                                    'content': response_content
-                                })
-                                st.session_state.pending_alternatives = None
-                                st.balloons()
-                            else:
-                                st.session_state.messages.append({
-                                    'role': 'agent',
-                                    'content': "❌ Failed to create the event. Please try again."
-                                })
-                                st.session_state.pending_alternatives = None
-                
+                # Store transcribed text for the NEXT text input
+                st.session_state.transcribed_text = transcription.text
+                st.session_state.audio_bytes = None  # Clear audio
+                st.success(f"✅ Transcribed: {transcription.text}")
                 st.rerun()
                 
             except Exception as e:
