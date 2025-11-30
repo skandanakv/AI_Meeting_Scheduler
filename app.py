@@ -3840,21 +3840,8 @@ with st.sidebar:
 
 
 
-# Page config
-st.set_page_config(page_title="AI Meeting Scheduler", page_icon="📅", layout="wide")
 
-# Local timezone
-LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
-# ---- CALENDAR CONNECTION CHECK ----
-with st.sidebar:
-    st.title("📅 Calendar Status")
-    service = get_calendar_service()
-    if service:
-        st.success("✅ Connected to Skandana's Calendar")
-    else:
-        st.error("❌ Calendar connection failed. Check your secrets.")
-        st.stop()
 
 # ---- INITIALIZE SESSION STATE ----
 if 'messages' not in st.session_state:
