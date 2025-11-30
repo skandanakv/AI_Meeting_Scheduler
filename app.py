@@ -3808,6 +3808,9 @@ import sys
 import os
 import json
 
+# Page config MUST BE FIRST - before any st.xxx commands!
+st.set_page_config(page_title="AI Meeting Scheduler", page_icon="📅", layout="wide")
+
 # Add parent directory to path (so scheduler package is importable)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -3817,31 +3820,24 @@ from scheduler.scheduler_logic import suggest_best_slot, format_slot_for_display
 from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events
 from groq import Groq
 
+# Local timezone
+LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
+# NOW you can use other st commands
+# ---- CALENDAR CONNECTION CHECK ----
+with st.sidebar:
+    st.title("📅 Calendar Status")
+    service = get_calendar_service()
+    if service:
+        st.success("✅ Connected to Skandana's Calendar")
+    else:
+        st.error("❌ Calendar connection failed. Check your secrets.")
+        st.stop()
 
-
-try:
-    # Add parent directory to path
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from scheduler.gpt_parser import parse_meeting_request
-    from scheduler.google_calendar import (
-        get_calendar_service,
-        get_upcoming_events,
-        create_event,
-        get_events_in_range
-    )
-    from scheduler.scheduler_logic import find_available_slots
-except Exception as e:
-    st.error(f"❌ Import Error: {e}")
-    st.stop()
+# ... rest of your code
 
 # Test connection on startup
-try:
-    test_service = get_calendar_service()
-    st.success("✅ Calendar connected!")
-except Exception as e:
-    st.error(f"❌ Calendar connection failed: {e}")
-    st.info("Check your secrets configuration")
+
 
 
 # Page config
