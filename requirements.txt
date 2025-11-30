@@ -10,3 +10,13 @@ groq==0.11.0
 streamlit-modal==0.1.0
 audio-recorder-streamlit
 python-dotenv
+
+
+
+streamlit
+google-auth
+google-auth-oauthlib
+google-api-python-client
+requests
+pytz
+groq
