@@ -399,8 +399,9 @@ python tests/test_full_flow.py
 **Skandana KV**
 
 📧 **Email**: [skandanakv@gmail.com](mailto:skandanakv@gmail.com)
-🔗 **LinkedIn**: [linkedin.com/in/yourprofile](https://www.linkedin.com/in/skandanakv)
-💻 **GitHub**: [github.com/yourusername](https://github.com/yourusername)
+🔗 **LinkedIn**: [linkedin.com/in/skandanakv](https://www.linkedin.com/in/skandanakv)
+💻 **GitHub**: [github.com/skandanakv](https://github.com/skandanakv)
 
 ---
+
 
