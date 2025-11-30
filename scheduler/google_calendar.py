@@ -17,17 +17,26 @@ SCOPES = [
 def get_calendar_service():
     """Get authenticated Google Calendar service using service account"""
     try:
-        credentials_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"])
+        # Get credentials from Streamlit secrets
+        creds_json = st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"]
+        credentials_dict = json.loads(creds_json)
         
+        # Create credentials
         credentials = service_account.Credentials.from_service_account_info(
             credentials_dict,
             scopes=SCOPES
         )
         
-        service = build('calendar', 'v3', credentials=credentials)
+        # Build service without cache discovery to avoid SSL issues
+        service = build('calendar', 'v3', credentials=credentials, cache_discovery=False)
+        
+        # Test the connection
+        service.calendarList().list(maxResults=1).execute()
+        
         return service
+        
     except Exception as e:
-        st.error(f"Error connecting to Google Calendar: {str(e)}")
+        st.error(f"❌ Calendar connection error: {str(e)}")
         return None
 
 
