@@ -3800,45 +3800,40 @@
 
 
 
-
 import streamlit as st
 import calendar as cal_module
 from datetime import datetime, timedelta
 import pytz
 import sys
 import os
+import json
 
-# Add parent directory to path
+# Add parent directory to path (so scheduler package is importable)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import your modules
 from scheduler.gpt_parser import parse_meeting_request
 from scheduler.scheduler_logic import suggest_best_slot, format_slot_for_display
-from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events  # ← REMOVED ensure_google_login
+from scheduler.google_calendar import get_calendar_service, create_event, get_upcoming_events
 from groq import Groq
 
 # Page config
 st.set_page_config(page_title="AI Meeting Scheduler", page_icon="📅", layout="wide")
 
+# Local timezone
 LOCAL_TZ = pytz.timezone('Asia/Kolkata')
 
-# ---- CALENDAR CONNECTION CHECK ---- (REPLACED LOGIN SECTION)
+# ---- CALENDAR CONNECTION CHECK ----
 with st.sidebar:
     st.title("📅 Calendar Status")
-    if get_calendar_service():
+    service = get_calendar_service()
+    if service:
         st.success("✅ Connected to Skandana's Calendar")
     else:
         st.error("❌ Calendar connection failed. Check your secrets.")
         st.stop()
 
-# ---- REST OF YOUR APP ----
-st.title("📅 AI Meeting Scheduler")
-
-# Your app logic continues here...
-
-LOCAL_TZ = pytz.timezone('Asia/Kolkata')
-
-# Initialize session state
+# ---- INITIALIZE SESSION STATE ----
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 if 'input_text' not in st.session_state:
@@ -3851,6 +3846,10 @@ if 'selected_date_for_view' not in st.session_state:
     st.session_state.selected_date_for_view = None
 if 'pending_alternatives' not in st.session_state:
     st.session_state.pending_alternatives = None
+
+# ---- APP TITLE ----
+st.title("📅 AI Meeting Scheduler")
+
 # Custom CSS
 st.markdown("""
 <style>
