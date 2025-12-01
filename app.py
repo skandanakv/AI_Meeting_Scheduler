@@ -1982,7 +1982,7 @@ if 'transcribed_text' not in st.session_state:
     st.session_state.transcribed_text = ""
 
 # ---- APP TITLE ----
-st.title("📅 AI Meeting Scheduler")
+# st.title("📅 AI Meeting Scheduler")
 
 # Custom CSS
 st.markdown("""
